@@ -7,24 +7,29 @@ from editor import VideoEditor
 from reddit import Reddit
 from tts import TTS
 from upload import get_uploader, UploaderType
-from selenium.webdriver import Firefox, FirefoxOptions
 
 
 class Bot:
     def __init__(self):
+        # get environment variables
         self._env = Env()
         self._env.read_env()
+
+        # get editor
         self._editor = VideoEditor()
-        opts = FirefoxOptions()
-        opts.add_argument("--headless")
-        opts.set_preference("dom.push.enabled", False)
-        driver = Firefox(options=opts)
+
+        # get reddit instance
         self._reddit = Reddit(self._env)
+
+        # get tts instance
         self._tts = TTS()
+
+        # get uploaders
         self._ytb_uploader = get_uploader(UploaderType.Youtube, self._env)
         self._tiktok_uploader = get_uploader(UploaderType.TikTok, self._env)
         self._instagram_uploader = get_uploader(UploaderType.Instagram, self._env)
 
+    # post a new video
     def post_new_video(self):
         post_data = self._tts.add_tts(self._reddit.get_post())
         # video_data = editor.create_video(post_data)
@@ -34,5 +39,6 @@ class Bot:
         pprint(post_data)
 
 
-bot = Bot()
-bot.post_new_video()
+if __name__ == "__main__":
+    bot = Bot()
+    bot.post_new_video()

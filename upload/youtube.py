@@ -1,9 +1,8 @@
 from environs import Env
 
-from upload.base_uploader import _BaseUploader
 
-
-class _Youtube(_BaseUploader):
+# upload video to youtube
+class _Youtube:
     def __init__(self, env: Env):
         self.env = env
         self._login()

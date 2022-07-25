@@ -1,9 +1,9 @@
 from environs import Env
 
-from upload.base_uploader import _BaseUploader
 
-
-class _Instagram(_BaseUploader):
+# instagram uploader class
+# still need to be implemented
+class _Instagram:
     def __init__(self, env: Env):
         self.env = env
         self._login()

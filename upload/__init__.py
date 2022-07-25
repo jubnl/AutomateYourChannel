@@ -3,14 +3,16 @@ from environs import Env
 from .instagram import _Instagram
 from .tiktok import _TikTok
 from .youtube import _Youtube
-from selenium.webdriver import Firefox
 
+
+# "enum" uploader type
 class UploaderType:
     Youtube = "youtube"
     TikTok = "tiktok"
     Instagram = "instagram"
 
 
+# get uploader instance (factory method)
 def get_uploader(uploader_type: str, env: Env):
     if uploader_type == UploaderType.Youtube:
         return _Youtube(env)
@@ -20,4 +22,3 @@ def get_uploader(uploader_type: str, env: Env):
         return _Instagram(env)
     else:
         raise Exception("Unknown uploader type")
-
