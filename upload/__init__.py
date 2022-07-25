@@ -3,7 +3,7 @@ from environs import Env
 from .instagram import _Instagram
 from .tiktok import _TikTok
 from .youtube import _Youtube
-
+from selenium.webdriver import Firefox
 
 class UploaderType:
     Youtube = "youtube"

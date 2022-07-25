@@ -4,9 +4,10 @@ import praw
 import pyttsx3
 from environs import Env
 from selenium.common import TimeoutException, NoSuchElementException
-from selenium.webdriver import Firefox, FirefoxOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+
+from helpers import FirefoxDriver
 
 
 class Reddit(praw.Reddit):
@@ -16,35 +17,21 @@ class Reddit(praw.Reddit):
             client_secret=env("REDDIT_CLIENT_SECRET"),
             user_agent=env("REDDIT_USER_AGENT")
         )
-        self._username = env("REDDIT_USERNAME")
-        self._password = env("REDDIT_PASSWORD")
+        self.env = env
         self._subreddit_name = None
-        opts = FirefoxOptions()
-        opts.add_argument("--headless")
-        opts.set_preference("dom.push.enabled", False)
-        self._drv = Firefox(options=opts)
+        self._drv = FirefoxDriver()
         self._timeout = 10
         self._base_url = "https://www.reddit.com"
         self._current_posts = {"comments": []}
         self._login()
         self._tts = pyttsx3.init()
 
-    @property
-    def subreddit_name(self):
-        if not self._subreddit_name:
-            self._subreddit_name = "AskReddit"
-        return self._subreddit_name
-
-    @subreddit_name.setter
-    def subreddit_name(self, subreddit):
-        self._subreddit_name = subreddit
-
     def _login(self):
         self._drv.get(self._base_url + "/login")
         user = self._drv.find_element(By.ID, "loginUsername")
-        user.send_keys(self._username)
+        user.send_keys(self.env("REDDIT_USERNAME"))
         pwd = self._drv.find_element(By.ID, "loginPassword")
-        pwd.send_keys(self._password)
+        pwd.send_keys(self.env("REDDIT_PASSWORD"))
         btn = self._drv.find_element(By.CSS_SELECTOR, "button[type='submit']")
         btn.click()
         sleep(self._timeout)
@@ -65,13 +52,10 @@ class Reddit(praw.Reddit):
         cookie.click()
         sleep(self._timeout)
 
-    def get_post(self, subreddit: str = None):
-        if subreddit:
-            self.subreddit_name = subreddit
-
+    def get_post(self, subreddit_name: str = "AskReddit"):
         self._current_posts = {"comments": []}
 
-        for submission in self.subreddit(self.subreddit_name).hot(limit=1):
+        for submission in self.subreddit(subreddit_name).hot(limit=1):
             self._drv.get(self._base_url + submission.permalink)
             if submission.over_18:
                 try:
@@ -88,6 +72,7 @@ class Reddit(praw.Reddit):
             else:
                 s_path = f"templates/image/post_{submission.name}.png"
                 post.screenshot(s_path)
+                self._current_posts["subreddit"] = subreddit_name
                 self._current_posts["id"] = submission.name
                 self._current_posts["title"] = submission.title
                 self._current_posts["s_title"] = s_path

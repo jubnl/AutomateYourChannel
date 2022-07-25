@@ -7,6 +7,7 @@ from editor import VideoEditor
 from reddit import Reddit
 from tts import TTS
 from upload import get_uploader, UploaderType
+from selenium.webdriver import Firefox, FirefoxOptions
 
 
 class Bot:
@@ -14,6 +15,10 @@ class Bot:
         self._env = Env()
         self._env.read_env()
         self._editor = VideoEditor()
+        opts = FirefoxOptions()
+        opts.add_argument("--headless")
+        opts.set_preference("dom.push.enabled", False)
+        driver = Firefox(options=opts)
         self._reddit = Reddit(self._env)
         self._tts = TTS()
         self._ytb_uploader = get_uploader(UploaderType.Youtube, self._env)
