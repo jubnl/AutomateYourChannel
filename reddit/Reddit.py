@@ -1,22 +1,23 @@
 from time import sleep
 
 import praw
+import pyttsx3
+from environs import Env
 from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver import Firefox, FirefoxOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-import pyttsx3
 
 
 class Reddit(praw.Reddit):
-    def __init__(self, client_id, client_secret, user_agent, username, password):
+    def __init__(self, env: Env):
         super().__init__(
-            client_id=client_id,
-            client_secret=client_secret,
-            user_agent=user_agent
+            client_id=env("REDDIT_CLIENT_ID"),
+            client_secret=env("REDDIT_CLIENT_SECRET"),
+            user_agent=env("REDDIT_USER_AGENT")
         )
-        self._username = username
-        self._password = password
+        self._username = env("REDDIT_USERNAME")
+        self._password = env("REDDIT_PASSWORD")
         self._subreddit_name = None
         opts = FirefoxOptions()
         opts.add_argument("--headless")
@@ -50,11 +51,13 @@ class Reddit(praw.Reddit):
 
         # not always here, so in a try except
         try:
-            close_btn = self._drv.find_element(By.XPATH,
-                                               '/html/body/div[1]/div/div[2]/div[4]/div/div/div/header/div[1]/div[2]/button/i')
+            close_btn = self._drv.find_element(
+                By.XPATH,
+                '/html/body/div[1]/div/div[2]/div[4]/div/div/div/header/div[1]/div[2]/button/i'
+            )
             close_btn.click()
             sleep(self._timeout)
-        except:
+        except NoSuchElementException:
             pass
 
         # kill cookie popup
@@ -70,10 +73,10 @@ class Reddit(praw.Reddit):
 
         for submission in self.subreddit(self.subreddit_name).hot(limit=1):
             self._drv.get(self._base_url + submission.permalink)
-            print(self._base_url + submission.permalink)
             if submission.over_18:
                 try:
                     self._drv.find_element(By.XPATH, '//button[text()="Yes"]').click()
+                    sleep(self._timeout)
                 except NoSuchElementException:
                     pass
             try:
@@ -81,7 +84,6 @@ class Reddit(praw.Reddit):
                     lambda x: x.find_element(By.ID, submission.name)
                 )
             except TimeoutException:
-                print("timed out")
                 continue
             else:
                 s_path = f"templates/image/post_{submission.name}.png"

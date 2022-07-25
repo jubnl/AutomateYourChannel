@@ -1,9 +1,11 @@
+from environs import Env
+
 from upload.base_uploader import _BaseUploader
 
 
 class _Instagram(_BaseUploader):
-    def __init__(self, creds):
-        self.creds = creds
+    def __init__(self, env: Env):
+        self.env = env
         self._login()
 
     def _login(self):
