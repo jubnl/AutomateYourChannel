@@ -1,5 +1,6 @@
 # Automate your channel !
-
+- python 3.10.x (I haven't tested if it works with previous versions)
+- All binaries included (ffmpeg, imagemagick, geckodriver)
 ## setup
 - Clone this repo
 - ``pip install -r requirements.txt``
