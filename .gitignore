@@ -263,3 +263,5 @@ templates/video/*
 !templates/video/.gitkeep
 main-test.py
 reddit.json
+credentials/*
+!credentials/.gitkeep

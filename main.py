@@ -1,4 +1,5 @@
 # https://gist.github.com/gavin19/8e2ed7547efcbb376e94f2057f951526
+import json
 
 from environs import Env
 
@@ -15,13 +16,13 @@ class Bot:
         self._env.read_env()
 
         # get editor
-        self._editor = VideoEditor(self._env)
+        self._editor = VideoEditor()
 
         # get reddit instance
         self._reddit = Reddit(self._env)
 
         # get tts instance
-        self._tts = TTS()
+        self._tts = TTS(self._env)
 
         # get uploaders
         self._ytb_uploader = get_uploader(UploaderType.Youtube, self._env)
@@ -30,8 +31,12 @@ class Bot:
 
     # post a new video
     def run(self):
-        post_data = self._tts.add_tts(self._reddit.get_post())
-        video_data = self._editor.create_video(post_data)
+        post_data = self._reddit.get_post()
+
+        post_data = self._tts.add_tts(post_data)
+        post_data = self._editor.create_video(post_data)
+        with open("reddit.json", "w") as f:
+            json.dump(post_data, f)
 
 
 if __name__ == "__main__":
