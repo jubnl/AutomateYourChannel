@@ -4,7 +4,7 @@
 - Clone this repo
 - ``pip install -r requirements.txt``
 - Rename the [.env.sample](.env.sample) file to .env
-- Edit your .env file :
+- Edit your .env file (see [How to create a reddit app](#How-to-create-a-reddit-app-:)) :
     - REDDIT_CLIENT_SECRET="YourClientSecret"
     - REDDIT_CLIENT_ID="YourClientId"
     - REDDIT_USER_AGENT="<AppName-AppVersion>"
@@ -13,3 +13,6 @@
 
 ### How to create a reddit app :
 - Follow this [tutorial](https://youtu.be/bMT9ZC9sBzI?t=228)
+
+## Usage
+run main.py
