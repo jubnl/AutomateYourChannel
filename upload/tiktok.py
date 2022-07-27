@@ -15,7 +15,7 @@ class _TikTok:
         self.env = env
         self.base_url = "https://www.tiktok.com"
         self._drv = FirefoxDriver()
-        self._login()
+        # self._login()
 
     # try to login to tiktok
     def _login(self):

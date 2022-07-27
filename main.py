@@ -1,5 +1,4 @@
 # https://gist.github.com/gavin19/8e2ed7547efcbb376e94f2057f951526
-from pprint import pprint
 
 from environs import Env
 
@@ -16,7 +15,7 @@ class Bot:
         self._env.read_env()
 
         # get editor
-        self._editor = VideoEditor()
+        self._editor = VideoEditor(self._env)
 
         # get reddit instance
         self._reddit = Reddit(self._env)
@@ -30,15 +29,11 @@ class Bot:
         self._instagram_uploader = get_uploader(UploaderType.Instagram, self._env)
 
     # post a new video
-    def post_new_video(self):
+    def run(self):
         post_data = self._tts.add_tts(self._reddit.get_post())
-        # video_data = editor.create_video(post_data)
-        # self.ytb_uploader.upload(video_data)
-        # self.tiktok_uploader.upload(video_data)
-        # self.instagram_uploader.upload(video_data)
-        pprint(post_data)
+        video_data = self._editor.create_video(post_data)
 
 
 if __name__ == "__main__":
     bot = Bot()
-    bot.post_new_video()
+    bot.run()

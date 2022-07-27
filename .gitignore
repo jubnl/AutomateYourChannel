@@ -254,10 +254,12 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,python
 
 # specific to this project
-geckodriver.log
+drivers/geckodriver.log
 templates/audio/*
 !templates/audio/.gitkeep
 templates/image/*
 !templates/image/.gitkeep
 templates/video/*
 !templates/video/.gitkeep
+main-test.py
+reddit.json

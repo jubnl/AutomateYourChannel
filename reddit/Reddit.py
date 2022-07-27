@@ -22,7 +22,7 @@ class Reddit(praw.Reddit):
         self._drv = FirefoxDriver()
         self._base_url = "https://www.reddit.com"
         self._current_posts = {"comments": []}
-
+        self.base_path = "templates\\image\\"
         # login into reddit using selenium
         self._login()
 
@@ -84,7 +84,7 @@ class Reddit(praw.Reddit):
 
             # if the page loaded, get the submission content (id, title) and screenshot the submission
             else:
-                s_path = f"templates/image/post_{submission.name}.png"
+                s_path = f"{self.base_path}post_{submission.name}.png"
                 post.screenshot(s_path)
                 self._current_posts["subreddit"] = subreddit_name
                 self._current_posts["id"] = submission.name
@@ -107,7 +107,7 @@ class Reddit(praw.Reddit):
                 # executed only if the comment loaded
                 else:
                     # screenshot the comment and get the comment content
-                    s_path = f"templates/image/comment_{_id}.png"
+                    s_path = f"{self.base_path}comment_{_id}.png"
                     post.screenshot(s_path)
                     self._current_posts["comments"].append(
                         {
