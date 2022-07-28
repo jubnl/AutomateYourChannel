@@ -1,67 +1,48 @@
 import os
+from ast import literal_eval
+from base64 import b64decode
+from urllib.parse import quote
 
-from environs import Env
-from google.cloud import texttospeech as tts
 from pydub import AudioSegment
+from requests import post
 
 
 class TTS:
     silent_time = 1.5
     fifty_nine_seconds = 59
 
-    def __init__(self, env: Env):
-        # init the tts engine
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + "\\credentials\\" + env(
-            "GOOGLE_AUTH_JSON_FILENAME")
-        self._tts = tts.TextToSpeechClient()
-        self.voice = tts.VoiceSelectionParams()
-        self.voice.name = "en-US-Standard-J"
-        self.voice.language_code = "en-US"
-        self.voice.ssml_gender = tts.SsmlVoiceGender.MALE
-        self.audio_config = tts.AudioConfig()
-        self.audio_config.audio_encoding = tts.AudioEncoding.LINEAR16
-
-        # self._tts = pyttsx3.init()
+    def __init__(self):
+        self.base_url = "https://warp-co.rs/https://api16-normal-useast5.us.tiktokv.com/media/api/text/speech/invoke" \
+                        "/?text_speaker=en_uk_003&req_text= "
+        self.headers = {"Origin": "https://warp-co.rs/"}
         self.base_path = "templates\\audio\\"
 
-    def add_tts(self, data):
-        request = self._prepare_request(data["title"])
-        response = self._tts.synthesize_speech(request=request).audio_content
-        a_path = f"{self.base_path}post_tts_{data['id']}.wav"
-        self._save_to_file(response, a_path)
-        data["a_title"] = a_path
-        data["duration"] = AudioSegment.from_file(a_path).duration_seconds
+    def add_tts(self, post_data):
+        response = post(self.base_url + quote(post_data["title"]), headers=self.headers)
+        a_path = self.base_path + f"post_tts_{post_data['id']}.wav"
+        post_data["duration"] = self._process_response(response, a_path) + self.silent_time
+        post_data["a_title"] = a_path
 
-        duration = data["duration"] + self.silent_time
+        duration = post_data["duration"]
 
         n = 0
-        for comment in data["comments"]:
+        for comment in post_data["comments"]:
             if duration > self.fifty_nine_seconds:
                 break
-            a_path = f"{self.base_path}comment_tts_{comment['id']}.wav"
-            request = self._prepare_request(comment["comment"])
-            response = self._tts.synthesize_speech(request=request).audio_content
-            self._save_to_file(response, a_path)
-            comment_duration = AudioSegment.from_file(a_path).duration_seconds
-            duration += comment_duration + self.silent_time
-            comment["duration"] = comment_duration + self.silent_time
-            comment["a_comment"] = a_path
             n += 1
-        data["comments"] = data["comments"][:n]
-        return data
-
-        # print(response)
+            a_path = f"{self.base_path}comment_tts_{comment['id']}.wav"
+            response = post(self.base_url + quote(comment["comment"]), headers=self.headers)
+            comment["duration"] = self._process_response(response, a_path) + self.silent_time
+            comment["a_comment"] = a_path
+            duration += comment["duration"]
+        post_data["comments"] = post_data["comments"][:n]
+        os.remove("tmp.mp3")
+        return post_data
 
     @staticmethod
-    def _save_to_file(data, path):
-        with open(path, "bx") as f:
-            f.write(data)
-
-    def _prepare_request(self, text: str):
-        synthesis_input = tts.SynthesisInput()
-        synthesis_input.text = text
-        request = tts.SynthesizeSpeechRequest()
-        request.input = synthesis_input
-        request.voice = self.voice
-        request.audio_config = self.audio_config
-        return request
+    def _process_response(response, wav_path):
+        with open("tmp.mp3", "wb") as f:
+            f.write(b64decode(literal_eval(response.text)["data"]["v_str"]))
+        tmp = AudioSegment.from_mp3("tmp.mp3")
+        tmp.export(wav_path, format="wav")
+        return tmp.duration_seconds

@@ -18,6 +18,7 @@ class VideoEditor:
     def create_video(self, post_data):
         post_data = self._create_audio(post_data)
         self._delete_audios()
+        post_data = self._update_last_clip_time(post_data)
         return post_data
 
     def _create_audio(self, post_data):
@@ -39,3 +40,12 @@ class VideoEditor:
         filelist = [f for f in os.listdir("templates\\audio") if f.endswith(".wav") and not f.startswith("merged_")]
         for f in filelist:
             os.remove(f"templates\\audio\\{f}")
+
+    @staticmethod
+    def _update_last_clip_time(post_data):
+        total = 59
+        total -= post_data["duration"]
+        for i in post_data["comments"]:
+            total -= i["duration"]
+        post_data["comments"][-1]["duration"] += total
+        return post_data

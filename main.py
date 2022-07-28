@@ -22,7 +22,7 @@ class Bot:
         self._reddit = Reddit(self._env)
 
         # get tts instance
-        self._tts = TTS(self._env)
+        self._tts = TTS()
 
         # get uploaders
         self._ytb_uploader = get_uploader(UploaderType.Youtube, self._env)
@@ -32,9 +32,11 @@ class Bot:
     # post a new video
     def run(self):
         post_data = self._reddit.get_post()
-
+        print(post_data)
         post_data = self._tts.add_tts(post_data)
+        print(post_data)
         post_data = self._editor.create_video(post_data)
+        print(post_data)
         with open("reddit.json", "w") as f:
             json.dump(post_data, f)
 
