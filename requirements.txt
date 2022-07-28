@@ -5,3 +5,4 @@ pyttsx3==2.90
 moviepy==1.0.3
 pydub==0.25.1
 requests==2.28.1
+pillow==9.2.0
