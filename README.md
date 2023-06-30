@@ -1,3 +1,7 @@
+# Disclaimer
+
+The project wont work anymore since Reddit's API become paid today. Keep the subreddit privte guys, we can't let them do that.
+
 # Automate your channel !
 - python 3.10.x (I haven't tested if it works with previous versions)
 - All binaries included (ffmpeg, imagemagick, geckodriver)
